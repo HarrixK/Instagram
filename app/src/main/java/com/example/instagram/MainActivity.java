@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth objectFirebaseAuth;
+    private LottieAnimationView lottie;
 
     private ProgressBar bar;
     private final static int RC_SIGN_IN = 231;
@@ -97,13 +99,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+            lottie = findViewById(R.id.Lottie);
+
             bar = findViewById(R.id.ProgressBar);
             createRequest();
             googlesignin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     signIn();
-                    bar.setVisibility(View.VISIBLE);
+                    lottie.playAnimation();
+                    lottie.setVisibility(View.VISIBLE);
+//                    bar.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -146,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                             emailET.requestFocus();
 
                             bar.setVisibility(View.INVISIBLE);
+                            lottie.setVisibility(View.INVISIBLE);
                             Toast.makeText(MainActivity.this, "Fails To Sig-in User: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -155,12 +162,14 @@ public class MainActivity extends AppCompatActivity {
                 emailET.requestFocus();
 
                 bar.setVisibility(View.INVISIBLE);
+                lottie.setVisibility(View.INVISIBLE);
                 Toast.makeText(this, "Please Enter The Email", Toast.LENGTH_SHORT).show();
             } else if (paswwordET.getText().toString().isEmpty()) {
                 signin.setEnabled(true);
                 paswwordET.requestFocus();
 
                 bar.setVisibility(View.INVISIBLE);
+                lottie.setVisibility(View.INVISIBLE);
                 Toast.makeText(this, "Please Enter The Password", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception ex) {
@@ -169,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             emailET.requestFocus();
 
             bar.setVisibility(View.INVISIBLE);
+            lottie.setVisibility(View.INVISIBLE);
             Toast.makeText(this, "Logging In Error" + ex.getMessage(), Toast.LENGTH_LONG).show();
         }
     }

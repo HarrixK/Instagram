@@ -1,11 +1,13 @@
 package Fragments;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.example.instagram.MainPage;
@@ -35,16 +40,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class CameraFragment extends Fragment {
     private ImageView imageToUploadIV;
@@ -53,16 +56,18 @@ public class CameraFragment extends Fragment {
     private TextView gallery;
     private ProgressBar bar;
 
-    private String picturePath;
+    private String currentPhotoPath;
 
     private Button imageUploadingBtn, quit, UploadImg;
     private static final int REQUEST_CODE = 124;
 
+    private static final int CAMERA_CODE = 124;
     private Uri imageDataInUriForm;
     private StorageReference objectStorageReference;
 
     private FirebaseFirestore objectFirebaseFirestore;
     private boolean isImageSelected = false;
+    private String CurrentPhotoPath;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,7 +99,7 @@ public class CameraFragment extends Fragment {
         imageUploadingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CameraOpen();
+                askCameraPermission();
                 hide();
             }
         });
@@ -106,13 +111,22 @@ public class CameraFragment extends Fragment {
         gallery.setVisibility(View.INVISIBLE);
     }
 
-    private void CameraOpen() {
-        try {
-            Intent objectIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(objectIntent, REQUEST_CODE);
-            hide();
-        } catch (Exception ex) {
-            Toast.makeText(getActivity(), "CameraOpen: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+    private void askCameraPermission() {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_CODE);
+        } else {
+            dispatchTakePictureIntent();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CAMERA_CODE) {
+            if (grantResults.length < 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                dispatchTakePictureIntent();
+            } else {
+                Toast.makeText(getActivity(), "Camera Persmission required to use Camera", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -120,17 +134,12 @@ public class CameraFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                imageToUploadIV.setImageBitmap(bitmap);
-                imageDataInUriForm = Uri.parse(String.valueOf(R.id.imageToUploadIV) + ".jpg");
-                Bitmap objectBitmap;
+            if (resultCode == getActivity().RESULT_OK) {
+                File f = new File(currentPhotoPath);
+                imageToUploadIV.setImageURI(Uri.fromFile(f));
+//                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+//                imageToUploadIV.setImageBitmap(bitmap);
 
-                Context applicationContext = MainPage.getContextOfApplication();
-                applicationContext.getContentResolver();
-
-                objectBitmap = MediaStore.Images.Media.getBitmap(applicationContext.getContentResolver(), imageDataInUriForm);
-                isImageSelected = true;
 
             } else if (requestCode != REQUEST_CODE) {
                 Toast.makeText(getActivity(), "Request code doesn't match", Toast.LENGTH_SHORT).show();
@@ -236,30 +245,42 @@ public class CameraFragment extends Fragment {
         return "";
     }
 
-//    private void onCaptureImageResult(Intent data) throws IOException {
-//        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-//        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-//        File destination = new File(getApplicationContext().getFilesDir(),
-//                System.currentTimeMillis() + ".jpg");
-//
-//        //destination.mkdirs();
-//        picturePath = destination.getAbsolutePath();
-//        FileOutputStream fo;
-//        try {
-//            destination.createNewFile();
-//            fo = new FileOutputStream(destination);
-//            fo.write(bytes.toByteArray());
-//            fo.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        imageToUploadIV.setImageBitmap(thumbnail);
-//        if (picturePath != null && !picturePath.isEmpty()) {
-//            boolean pictureChanged = true;
-//        }
-//    }
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                Toast.makeText(getActivity(), "Exception at Dispatch Pitcure", Toast.LENGTH_SHORT).show();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_CODE);
+            }
+        }
+    }
 
 }

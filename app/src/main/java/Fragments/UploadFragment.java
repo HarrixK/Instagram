@@ -24,11 +24,16 @@ import androidx.fragment.app.Fragment;
 
 import com.example.instagram.MainPage;
 import com.example.instagram.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -56,6 +61,11 @@ public class UploadFragment extends Fragment {
 
     private FirebaseFirestore objectFirebaseFirestore;
     private boolean isImageSelected = false;
+    private GoogleSignInClient mGoogleSignInClient;
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseAuth;
+    private String User;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +99,17 @@ public class UploadFragment extends Fragment {
                 uploadOurImage();
             }
         });
+        mAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseAuth != null) {
+            User = firebaseAuth.getDisplayName().toString();
+        }
+
+
+        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (signInAccount != null) {
+            User = signInAccount.getDisplayName().toString();
+        }
 
         return view;
     }
@@ -171,6 +192,7 @@ public class UploadFragment extends Fragment {
                             objectMap.put("URL", url);
                             objectMap.put("Comments", Caption);
                             objectMap.put("Server Time Stamp", FieldValue.serverTimestamp());
+                            objectMap.put("By", User);
                             objectFirebaseFirestore.collection("Gallery")
                                     .document(imageNameET.getText().toString())
                                     .set(objectMap)
