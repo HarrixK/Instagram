@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBlack"
+    tools:context=".AdminMainPage">
+
+    <ImageView
+        android:id="@+id/InstagramName"
+        android:layout_width="300dp"
+        android:layout_height="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/instaname" />
+
+
+    <TextView
+        android:id="@+id/bar1"
+        android:layout_width="150dp"
+        android:layout_height="4dp"
+        android:layout_below="@id/InstagramName"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorDarkGrey" />
+
+    <TextView
+        android:id="@+id/bar2"
+        android:layout_width="150dp"
+        android:layout_height="4dp"
+        android:layout_below="@id/InstagramName"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@color/colorDarkGrey" />
+
+    <TextView
+        android:id="@+id/OR"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_below="@id/InstagramName"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:text="Home"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/Lottie"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@id/OR"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:scaleType="fitCenter"
+        android:visibility="visible"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="welcome_admin.json"
+        app:lottie_loop="true" />
+
+    <TextView
+        android:id="@+id/Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Lottie"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/cookie"
+        android:text="Dummy Name"
+        android:textColor="@color/colorWhite"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/Report"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_above="@id/Signout"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/loginbutton"
+        android:text="Check Reported Posts"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/Signout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/loginbutton"
+        android:text="Settings"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp" />
+
+
+</RelativeLayout>

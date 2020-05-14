@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,8 +13,9 @@
         android:layout_height="150dp"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/instaname" />
+
 
     <TextView
         android:id="@+id/bar1"
@@ -65,7 +67,7 @@
     <ImageView
         android:id="@+id/imageToUploadIV"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:layout_below="@id/Caption"
         android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
@@ -79,8 +81,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/Caption"
         android:layout_centerInParent="true"
-        android:layout_marginTop="100dp"
-        android:text="Select An Image To Upload"
+        android:layout_marginTop="150dp"
+        android:text="Image From Camera To Be Display Here"
         android:textColor="@color/colorDarkGrey"
         android:textSize="20sp"
         android:textStyle="italic"
@@ -88,7 +90,7 @@
 
     <Button
         android:id="@+id/Upload"
-        android:layout_width="50dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/imageToUploadIV"
         android:layout_marginStart="10dp"
@@ -96,24 +98,22 @@
         android:layout_marginEnd="10dp"
         android:background="@drawable/loginbutton"
         android:drawableStart="@drawable/ic_camera"
-        android:paddingStart="13dp" />
+        android:paddingStart="13dp"
+        android:paddingEnd="50dp"
+        android:text="Open Camera" />
 
-    <Button
-        android:id="@+id/UploadImg"
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/Lottie"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_below="@id/imageToUploadIV"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
-        android:layout_toRightOf="@id/Upload"
-        android:background="@drawable/loginbutton"
-        android:paddingStart="10dp"
-        android:paddingEnd="20dp"
-        android:text="Upload"
-        android:textAllCaps="false"
-        android:textColor="@color/colorWhite"
-        android:textSize="15sp" />
+        android:layout_height="80dp"
+        android:layout_below="@id/Upload"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="black_loading.json"
+        app:lottie_loop="true" />
+
 
     <ProgressBar
         android:id="@+id/ProgressBar"

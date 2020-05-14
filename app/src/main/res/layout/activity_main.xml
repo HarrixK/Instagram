@@ -152,6 +152,18 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/LoginWithText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/LoginGoogle"
+        android:text="Log in as Admin"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
     <ProgressBar
         android:id="@+id/ProgressBar"
         android:layout_width="80dp"

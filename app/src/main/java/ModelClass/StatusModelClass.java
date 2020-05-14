@@ -1,7 +1,7 @@
 package ModelClass;
 
 public class StatusModelClass {
-    private String URL, Comments;
+    private String URL, Comments, By;
 
     public StatusModelClass() {
     }
@@ -12,5 +12,9 @@ public class StatusModelClass {
 
     public String getComments() {
         return Comments;
+    }
+
+    public String getBy() {
+        return By;
     }
 }

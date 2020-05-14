@@ -22,10 +22,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.instagram.MainPage;
 import com.example.instagram.R;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -52,6 +51,7 @@ public class UploadFragment extends Fragment {
 
     private TextView gallery;
     private ProgressBar bar;
+    private LottieAnimationView lottie;
 
     private Button imageUploadingBtn, quit;
     private static final int REQUEST_CODE = 124;
@@ -65,7 +65,7 @@ public class UploadFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseAuth;
-    private String User;
+    public String User;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,6 +84,7 @@ public class UploadFragment extends Fragment {
 
         bar = view.findViewById(R.id.ProgressBar);
         objectFirebaseFirestore = FirebaseFirestore.getInstance();
+        lottie = view.findViewById(R.id.Lottie);
 
         objectStorageReference = FirebaseStorage.getInstance().getReference("Gallery");
         imageToUploadIV.setOnClickListener(new View.OnClickListener() {
@@ -105,11 +106,10 @@ public class UploadFragment extends Fragment {
             User = firebaseAuth.getDisplayName().toString();
         }
 
-
-        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (signInAccount != null) {
-            User = signInAccount.getDisplayName().toString();
-        }
+//        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
+//        if (signInAccount != null) {
+//            User = signInAccount.getDisplayName().toString();
+//        }
 
         return view;
     }
@@ -146,6 +146,7 @@ public class UploadFragment extends Fragment {
 
                 objectBitmap = MediaStore.Images.Media.getBitmap(applicationContext.getContentResolver(), imageDataInUriForm);
                 isImageSelected = true;
+                imageToUploadIV.setImageBitmap(objectBitmap);
 
             } else if (requestCode != REQUEST_CODE) {
                 Toast.makeText(getActivity(), "Request code doesn't match", Toast.LENGTH_SHORT).show();
@@ -165,7 +166,8 @@ public class UploadFragment extends Fragment {
         try {
             if (imageDataInUriForm != null && !imageNameET.getText().toString().isEmpty()
                     && isImageSelected) {
-                bar.setVisibility(View.VISIBLE);
+                lottie.playAnimation();
+                lottie.setVisibility(View.VISIBLE);
                 //yourName.jpeg
                 String imageName = imageNameET.getText().toString() + "." + getExtension(imageDataInUriForm);
                 final String Caption = imageNameET.getText().toString();
@@ -178,7 +180,7 @@ public class UploadFragment extends Fragment {
                     @Override
                     public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                         if (!task.isSuccessful()) {
-                            bar.setVisibility(View.INVISIBLE);
+                            lottie.setVisibility(View.INVISIBLE);
                             throw task.getException();
                         }
                         return actualImageRef.getDownloadUrl();
@@ -199,6 +201,26 @@ public class UploadFragment extends Fragment {
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
+//                                            bar.setVisibility(View.INVISIBLE);
+//                                            Toast.makeText(getActivity(), "Fails To Upload Image URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            imageNameET.setText("");
+                                            imageToUploadIV.setVisibility(View.INVISIBLE);
+                                            lottie.setVisibility(View.INVISIBLE);
+                                            gallery.setVisibility(View.VISIBLE);
+                                            Toast.makeText(getActivity(), "Image Successfully Uploaded: ", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                            objectFirebaseFirestore.collection(User)
+                                    .document(imageNameET.getText().toString())
+                                    .set(objectMap)
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
                                             bar.setVisibility(View.INVISIBLE);
                                             Toast.makeText(getActivity(), "Fails To Upload Image URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
@@ -208,7 +230,7 @@ public class UploadFragment extends Fragment {
                                         public void onSuccess(Void aVoid) {
                                             imageNameET.setText("");
                                             imageToUploadIV.setVisibility(View.INVISIBLE);
-                                            bar.setVisibility(View.INVISIBLE);
+                                            lottie.setVisibility(View.INVISIBLE);
                                             gallery.setVisibility(View.VISIBLE);
                                             Toast.makeText(getActivity(), "Image Successfully Uploaded: ", Toast.LENGTH_SHORT).show();
                                         }
@@ -218,7 +240,7 @@ public class UploadFragment extends Fragment {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        bar.setVisibility(View.INVISIBLE);
+                        lottie.setVisibility(View.INVISIBLE);
                         Toast.makeText(getActivity(), "Fails To Upload Image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });

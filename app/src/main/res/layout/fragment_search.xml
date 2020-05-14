@@ -1,9 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="Fragments.SearchFragment"
-    android:background="@color/colorWhite">
+    android:background="@color/colorWhite"
+    tools:context="Fragments.SearchFragment">
 
     <ImageView
         android:id="@+id/InstagramName"
@@ -11,108 +12,163 @@
         android:layout_height="150dp"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/instanameblack" />
 
-    <TextView
-        android:layout_width="150dp"
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/Search"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/OR"
         android:layout_marginStart="10dp"
-        android:layout_below="@id/InstagramName"
-        android:id="@+id/bar1"
-        android:layout_height="4dp"
-        android:background="@color/colorDarkGrey"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/search_bar"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="10dp"
+        android:hint="Search"
+        android:inputType="text"
+        android:maxLength="25"
+        android:maxLines="1"
+        android:paddingStart="10dp"
+        android:textColor="@color/colorBlack"
+        android:textColorHint="@color/colorGrey"
+        android:textSize="20sp"
+        app:queryHint="Search" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RCV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/Search"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="40dp" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/Lottie"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="upload_loading.json"
+        app:lottie_loop="true" />
 
     <TextView
+        android:id="@+id/bar1"
         android:layout_width="150dp"
-        android:layout_marginEnd="10dp"
+        android:layout_height="4dp"
+        android:layout_below="@id/InstagramName"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorDarkGrey" />
+
+    <TextView
+        android:id="@+id/bar2"
+        android:layout_width="150dp"
+        android:layout_height="4dp"
         android:layout_below="@id/InstagramName"
         android:layout_alignParentRight="true"
-        android:id="@+id/bar2"
-        android:layout_height="4dp"
-        android:background="@color/colorDarkGrey"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@color/colorDarkGrey" />
 
     <TextView
+        android:id="@+id/OR"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
-        android:id="@+id/OR"
+        android:layout_below="@id/InstagramName"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
         android:text="Search"
         android:textColor="@color/colorBlack"
         android:textSize="15sp"
-        android:textStyle="bold"
-        android:layout_centerInParent="true"
-        android:layout_below="@id/InstagramName"
-        android:layout_marginTop="10dp"/>
+        android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/Caption"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_below="@id/bar1"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/textviewlogin"
-        android:hint="Enter Search Here"
-        android:textAllCaps="false"
-        android:paddingStart="10dp"
-        android:paddingTop="5dp"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorGrey"
-        android:textSize="20sp" />
+    <!--    <EditText-->
+    <!--        android:id="@+id/Caption"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="50dp"-->
+    <!--        android:layout_below="@id/bar1"-->
+    <!--        android:layout_marginStart="10dp"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:layout_marginEnd="10dp"-->
+    <!--        android:background="@drawable/textviewlogin"-->
+    <!--        android:hint="Enter Search Here"-->
+    <!--        android:paddingStart="10dp"-->
+    <!--        android:paddingTop="5dp"-->
+    <!--        android:textAllCaps="false"-->
+    <!--        android:textColor="@color/colorWhite"-->
+    <!--        android:textColorHint="@color/colorGrey"-->
+    <!--        android:textSize="20sp" />-->
 
-    <ImageView
-        android:id="@+id/imageToDownloadIV"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="20dp"
-        android:layout_below="@id/Caption"
-        android:layout_marginStart="10dp"
-        android:background="@drawable/bg_iv"
-        android:layout_marginEnd="10dp"
-        android:scaleType="centerCrop" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/imageToDownloadIV"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="300dp"-->
+    <!--        android:layout_below="@id/Caption"-->
+    <!--        android:layout_marginStart="10dp"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:layout_marginEnd="10dp"-->
+    <!--        android:background="@drawable/bg_iv"-->
+    <!--        android:scaleType="centerCrop" />-->
 
-    <TextView
-        android:id="@+id/textgallery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/Caption"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="100dp"
-        android:text="Image to Be Displayed"
-        android:textColor="@color/colorDarkGrey"
-        android:textSize="20sp"
-        android:textStyle="italic"
-        android:visibility="visible" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/textgallery"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_below="@id/Caption"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:layout_marginTop="150dp"-->
+    <!--        android:text="Image to Be Displayed"-->
+    <!--        android:textColor="@color/colorDarkGrey"-->
+    <!--        android:textSize="20sp"-->
+    <!--        android:textStyle="italic"-->
+    <!--        android:visibility="visible" />-->
 
-    <Button
-        android:id="@+id/Download"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_below="@id/imageToDownloadIV"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/loginbutton"
-        android:drawableStart="@drawable/ic_search"
-        android:paddingStart="10dp"
-        android:layout_marginTop="20dp"
-        android:paddingEnd="20dp"
-        android:text="Search"
-        android:textAllCaps="false"
-        android:textColor="@color/colorWhite"
-        android:textSize="15sp" />
+    <!--    <Button-->
+    <!--        android:id="@+id/Download"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="50dp"-->
+    <!--        android:layout_below="@id/imageToDownloadIV"-->
+    <!--        android:layout_marginStart="10dp"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:layout_marginEnd="10dp"-->
+    <!--        android:background="@drawable/loginbutton"-->
+    <!--        android:drawableStart="@drawable/ic_search"-->
+    <!--        android:paddingStart="10dp"-->
+    <!--        android:paddingEnd="20dp"-->
+    <!--        android:text="Search"-->
+    <!--        android:textAllCaps="false"-->
+    <!--        android:textColor="@color/colorWhite"-->
+    <!--        android:textSize="15sp" />-->
 
-    <ProgressBar
-        android:id="@+id/ProgressBar"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="600dp"
-        android:background="@drawable/progress_bar"
-        android:outlineAmbientShadowColor="@color/colorPrimaryDark"
-        android:outlineSpotShadowColor="@color/colorPrimaryDark"
-        android:visibility="invisible" />
+    <!--    <com.airbnb.lottie.LottieAnimationView-->
+    <!--        android:id="@+id/Lottie"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="80dp"-->
+    <!--        android:layout_below="@id/Download"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:scaleType="centerCrop"-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:lottie_autoPlay="false"-->
+    <!--        app:lottie_fileName="white_loading.json"-->
+    <!--        app:lottie_loop="true" />-->
+
+    <!--    <ProgressBar-->
+    <!--        android:id="@+id/ProgressBar"-->
+    <!--        android:layout_width="80dp"-->
+    <!--        android:layout_height="80dp"-->
+    <!--        android:layout_alignParentTop="true"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:layout_marginTop="600dp"-->
+    <!--        android:background="@drawable/progress_bar"-->
+    <!--        android:outlineAmbientShadowColor="@color/colorPrimaryDark"-->
+    <!--        android:outlineSpotShadowColor="@color/colorPrimaryDark"-->
+    <!--        android:visibility="invisible" />-->
 
 </RelativeLayout>

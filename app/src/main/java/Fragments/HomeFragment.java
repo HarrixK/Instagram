@@ -11,10 +11,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.instagram.R;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -27,9 +29,11 @@ public class HomeFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private RecyclerView rcv;
-    private FirebaseFirestore objectFirebaseAuth;
 
+    private FirebaseFirestore objectFirebaseAuth;
     private StatusAdapterClass objectStatusAdapter;
+
+    private LottieAnimationView lottie;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         rcv = view.findViewById(R.id.RCV);
         comment = view.findViewById(R.id.Comment);
+        lottie = view.findViewById(R.id.Lottie);
         ConnectXML();
         return view;
     }
@@ -61,13 +66,20 @@ public class HomeFragment extends Fragment {
             Query objectQuery = objectFirebaseAuth.collection("Gallery");
             FirestoreRecyclerOptions<StatusModelClass> options =
                     new FirestoreRecyclerOptions.Builder<StatusModelClass>().setQuery(objectQuery, StatusModelClass.class).build();
-            objectStatusAdapter = new StatusAdapterClass(options);
+            objectStatusAdapter = new StatusAdapterClass(options, getActivity());
 
             rcv.setLayoutManager(new LinearLayoutManager(getActivity()));
             rcv.setAdapter(objectStatusAdapter);
         } catch (Exception ex) {
             Toast.makeText(getActivity(), "AddValuesToRV: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
+        objectStatusAdapter.setOnItemClickListner(new StatusAdapterClass.onItemClickListner() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+                Toast.makeText(getActivity(), "Image Liked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     @Override

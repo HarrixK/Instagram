@@ -40,6 +40,7 @@ public class MainPage extends AppCompatActivity {
 
     TextView name, mail;
     private FirebaseAuth mAuth;
+
     private FirebaseUser firebaseAuth;
     private DatabaseReference reference;
 
@@ -86,7 +87,6 @@ public class MainPage extends AppCompatActivity {
                         case R.id.item_Search:
                             changeFragment(searchFragment);
                             return true;
-
                         case R.id.item_Camera:
                             changeFragment(cameraFragment);
                             return true;
@@ -113,11 +113,12 @@ public class MainPage extends AppCompatActivity {
             View navHeader = objectNavigationView.getHeaderView(0);
 
             headerIV = navHeader.findViewById(R.id.header_profileIV);
+
             name = navHeader.findViewById(R.id.name);
             mail = navHeader.findViewById(R.id.mail);
 
             firebaseAuth = FirebaseAuth.getInstance().getCurrentUser();
-            if( firebaseAuth !=null ){
+            if (firebaseAuth != null) {
                 name.setText(firebaseAuth.getDisplayName());
                 mail.setText(firebaseAuth.getEmail());
             }
@@ -143,29 +144,16 @@ public class MainPage extends AppCompatActivity {
                     new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
                         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                            if (item.getItemId() == R.id.item_Archive) {
-                                Toast.makeText(MainPage.this, "Archive here", Toast.LENGTH_SHORT).show();
-                                closeMyDrawer();
-                                return true;
-                            } else if (item.getItemId() == R.id.item_Activity) {
-                                Toast.makeText(MainPage.this, "Activity here", Toast.LENGTH_SHORT).show();
-                                closeMyDrawer();
-                                return true;
-                            } else if (item.getItemId() == R.id.Nametag) {
-                                Toast.makeText(MainPage.this, "NameTag here", Toast.LENGTH_SHORT).show();
-                                closeMyDrawer();
-                                return true;
-                            } else if (item.getItemId() == R.id.CloseF) {
-                                Toast.makeText(MainPage.this, "Close Firends here", Toast.LENGTH_SHORT).show();
+                            if (item.getItemId() == R.id.Nametag) {
+                                Intent intent = new Intent(getApplicationContext(), NameTag.class);
+                                startActivity(intent);
+                                Toast.makeText(MainPage.this, "Opening NameTag", Toast.LENGTH_SHORT).show();
                                 closeMyDrawer();
                                 return true;
                             } else if (item.getItemId() == R.id.Discover) {
+                                Intent intent = new Intent(getApplicationContext(), DiscoverPeople.class);
+                                startActivity(intent);
                                 Toast.makeText(MainPage.this, "Opening Discover", Toast.LENGTH_SHORT).show();
-                                closeMyDrawer();
-                                changeFragment(searchFragment);
-                                return true;
-                            } else if (item.getItemId() == R.id.Saved) {
-                                Toast.makeText(MainPage.this, "Saved here", Toast.LENGTH_SHORT).show();
                                 closeMyDrawer();
                                 return true;
                             } else if (item.getItemId() == R.id.Settings) {
@@ -174,7 +162,14 @@ public class MainPage extends AppCompatActivity {
                                 Toast.makeText(MainPage.this, "Opening Settings", Toast.LENGTH_SHORT).show();
                                 closeMyDrawer();
                                 return true;
+                            } else if (item.getItemId() == R.id.item_DirectMessage) {
+                                Intent intent = new Intent(getApplicationContext(), DirectMessage.class);
+                                startActivity(intent);
+                                Toast.makeText(MainPage.this, "Opening DM", Toast.LENGTH_SHORT).show();
+                                closeMyDrawer();
+                                return true;
                             }
+
                             return false;
                         }
                     }

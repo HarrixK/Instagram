@@ -2,12 +2,35 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_rcv">
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/avatar_icon" />
+
+    <TextView
+        android:id="@+id/UserProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_toRightOf="@id/avatar"
+        android:text="Username here."
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        android:textSize="15sp" />
+
 
     <ImageView
         android:id="@+id/IV"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
+        android:layout_below="@id/avatar"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
@@ -19,9 +42,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/IV"
-        android:layout_marginStart="20dp"
+        android:layout_toRightOf="@id/Like"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:src="@drawable/ic_comment" />
+
+    <ImageView
+        android:id="@+id/Like"
+        android:layout_width="30dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/IV"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/love" />
 
     <TextView
         android:id="@+id/bar1"
@@ -47,10 +80,23 @@
         android:layout_below="@id/IV"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
-        android:textAllCaps="false"
-        android:textSize="15sp"
+        android:layout_toRightOf="@id/Comment"
         android:text="Comments Here."
+        android:textAllCaps="false"
         android:textColor="@color/colorBlack"
-        android:layout_toRightOf="@id/Comment" />
+        android:textSize="15sp" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_marginTop="10dp"
+        android:id="@+id/Lottie"
+        android:layout_below="@id/avatar"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="like.json"
+        app:lottie_loop="true" />
 
 </RelativeLayout>

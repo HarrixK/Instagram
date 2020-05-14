@@ -1,24 +1,25 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccentDark"
+    android:background="@color/colorWhite"
     tools:context="Fragments.ProfileFragment">
 
-    <ImageView
-        android:id="@+id/InstagramName"
-        android:layout_width="300dp"
-        android:layout_height="150dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="50dp"
-        android:src="@drawable/instanameblack" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/InstagramName"-->
+    <!--        android:layout_width="300dp"-->
+    <!--        android:layout_height="150dp"-->
+    <!--        android:layout_alignParentTop="true"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:layout_marginTop="10dp"-->
+    <!--        android:src="@drawable/instanameblack" />-->
 
     <TextView
         android:id="@+id/bar1"
         android:layout_width="150dp"
         android:layout_height="4dp"
-        android:layout_below="@id/InstagramName"
+        android:layout_below="@id/Update"
         android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
         android:background="@color/colorDarkGrey" />
@@ -27,7 +28,7 @@
         android:id="@+id/bar2"
         android:layout_width="150dp"
         android:layout_height="4dp"
-        android:layout_below="@id/InstagramName"
+        android:layout_below="@id/Update"
         android:layout_alignParentRight="true"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
@@ -37,7 +38,7 @@
         android:id="@+id/OR"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
-        android:layout_below="@id/InstagramName"
+        android:layout_below="@id/Update"
         android:layout_centerInParent="true"
         android:layout_marginTop="10dp"
         android:text="Welcome"
@@ -45,25 +46,47 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/header_profileIV"
-        android:layout_width="150dp"
+    <Button
+        android:id="@+id/Update"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_below="@id/Bio"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/loginbutton"
+        android:text="Edit Profile"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp" />
+
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/ProfileIV"
+        android:layout_width="100dp"
         android:layout_height="150dp"
-        android:layout_below="@id/bar1"
-        android:layout_centerInParent="true"
-        android:src="@drawable/avatar_icon" />
+        android:layout_marginStart="20dp"
+        android:src="@drawable/avatar_icon"
+        app:civ_border_color="#FF000000"
+        app:civ_border_width="2dp" />
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/ProfileIV"-->
+    <!--        android:layout_width="100dp"-->
+    <!--        android:layout_height="150dp"-->
+    <!--        android:layout_marginStart="20dp"-->
+    <!--        android:scaleType="fitCenter"-->
+    <!--        android:src="@drawable/avatar_icon" />-->
 
     <TextView
         android:id="@+id/mail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/header_profileIV"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="55dp"
+        android:layout_toRightOf="@id/ProfileIV"
+        android:text="Dummy Email"
         android:textColor="@color/colorDarkGrey"
-        android:textSize="25sp"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
     <TextView
@@ -72,8 +95,47 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/mail"
         android:layout_centerInParent="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/ProfileIV"
+        android:text="Dummy Name"
         android:textColor="@color/colorDarkGrey"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/Bio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ProfileIV"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:text="No Bio to Display"
+        android:textColor="@color/colorDarkGrey"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RCV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/OR"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="45dp" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/Lottie"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="upload_loading.json"
+        app:lottie_loop="true" />
 
 </RelativeLayout>

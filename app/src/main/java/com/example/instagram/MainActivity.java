@@ -5,18 +5,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -26,7 +22,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,7 +30,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView Signup;
+    private TextView Signup, LoginasAdmin;
     private EditText emailET, paswwordET;
 
     private Button signin, googlesignin;
@@ -47,13 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressBar bar;
     private final static int RC_SIGN_IN = 231;
-
-    private CallbackManager mCallbackManager;
-    private NavigationView objectNavigationView;
-    private ImageView headerIV;
-
-    private DrawerLayout objectDrawerLayout;
-    private Toolbar objectToolbar;
 
     @Override
     protected void onStart() {
@@ -69,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ConnectWithXML();
     }
 
@@ -82,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
             paswwordET = findViewById(R.id.Password);
 
             googlesignin = findViewById(R.id.LoginGoogle);
+            LoginasAdmin = findViewById(R.id.LoginWithText);
 
             Signup.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -103,13 +91,20 @@ public class MainActivity extends AppCompatActivity {
 
             bar = findViewById(R.id.ProgressBar);
             createRequest();
+
             googlesignin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     signIn();
                     lottie.playAnimation();
                     lottie.setVisibility(View.VISIBLE);
-//                    bar.setVisibility(View.VISIBLE);
+                }
+            });
+            LoginasAdmin.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(MainActivity.this, AdminLogin.class));
+                    finish();
                 }
             });
 
@@ -151,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
                             signin.setEnabled(true);
                             emailET.requestFocus();
 
-                            bar.setVisibility(View.INVISIBLE);
                             lottie.setVisibility(View.INVISIBLE);
                             Toast.makeText(MainActivity.this, "Fails To Sig-in User: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -202,17 +196,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        bar.setVisibility(View.VISIBLE);
+        lottie.setVisibility(View.VISIBLE);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                bar.setVisibility(View.INVISIBLE);
+                lottie.setVisibility(View.INVISIBLE);
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                bar.setVisibility(View.INVISIBLE);
+                lottie.setVisibility(View.INVISIBLE);
                 Toast.makeText(this, "Login Failed: " + e.getMessage().toString(), Toast.LENGTH_SHORT).show();
             }
         }
@@ -227,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Toast.makeText(MainActivity.this, "signInWithCredential:success", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Logged In", Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
                             Intent intent = new Intent(getApplicationContext(), MainPage.class);
                             startActivity(intent);

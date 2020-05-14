@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -118,16 +119,28 @@
         android:textSize="15sp"
         android:textStyle="bold" />
 
-    <ProgressBar
-        android:id="@+id/ProgressBar"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="80dp"
-        android:layout_alignParentTop="true"
+    <TextView
+        android:id="@+id/Admin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Signup"
         android:layout_centerInParent="true"
-        android:background="@drawable/progress_bar"
-        android:outlineAmbientShadowColor="@color/colorPrimaryDark"
-        android:outlineSpotShadowColor="@color/colorPrimaryDark"
-        android:visibility="invisible" />
+        android:layout_marginTop="10dp"
+        android:text="Sign up as an Admin"
+        android:textColor="@color/colorGrey"
+        android:textSize="15sp" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/Lottie"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@id/Signup"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="upload_loading.json"
+        app:lottie_loop="true" />
 
 </RelativeLayout>

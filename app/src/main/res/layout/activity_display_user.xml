@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    tools:context=".DisplayUser">
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/ic_arrow" />
+
+    <ImageView
+        android:id="@+id/InstagramNameTV"
+        android:layout_width="300dp"
+        android:layout_height="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/instanameblack" />
+
+    <TextView
+        android:id="@+id/bar1"
+        android:layout_width="150dp"
+        android:layout_height="4dp"
+        android:layout_below="@id/InstagramNameTV"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorDarkGrey" />
+
+    <TextView
+        android:id="@+id/bar2"
+        android:layout_width="150dp"
+        android:layout_height="4dp"
+        android:layout_below="@id/InstagramNameTV"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:background="@color/colorDarkGrey" />
+
+    <TextView
+        android:id="@+id/OR"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_below="@id/InstagramNameTV"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:text="Search"
+        android:textColor="@color/colorPrimary"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/avatarIV"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_below="@id/OR"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/avatar_icon"
+        app:civ_border_color="#FF000000"
+        app:civ_border_width="2dp" />
+
+    <TextView
+        android:id="@+id/Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/avatarIV"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/cookie"
+        android:text="Dummy Name"
+        android:textColor="@color/colorBlack"
+        android:textSize="45sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

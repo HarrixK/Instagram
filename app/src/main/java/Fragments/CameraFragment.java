@@ -1,8 +1,6 @@
 package Fragments;
 
 import android.Manifest;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,7 +10,6 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,13 +24,16 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
-import com.example.instagram.MainPage;
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.instagram.R;
-import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
+import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class CameraFragment extends Fragment {
     private ImageView imageToUploadIV;
@@ -57,6 +58,7 @@ public class CameraFragment extends Fragment {
     private ProgressBar bar;
 
     private String currentPhotoPath;
+    private LottieAnimationView lottie;
 
     private Button imageUploadingBtn, quit, UploadImg;
     private static final int REQUEST_CODE = 124;
@@ -68,6 +70,10 @@ public class CameraFragment extends Fragment {
     private FirebaseFirestore objectFirebaseFirestore;
     private boolean isImageSelected = false;
     private String CurrentPhotoPath;
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseAuth;
+    private String User;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,24 +92,30 @@ public class CameraFragment extends Fragment {
 
         bar = view.findViewById(R.id.ProgressBar);
         objectFirebaseFirestore = FirebaseFirestore.getInstance();
-
-        UploadImg = view.findViewById(R.id.UploadImg);
-        UploadImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadOurImage();
-            }
-        });
+        lottie = view.findViewById(R.id.Lottie);
 
         objectStorageReference = FirebaseStorage.getInstance().getReference("Gallery");
         imageUploadingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                lottie.playAnimation();
+                lottie.setVisibility(View.VISIBLE);
                 askCameraPermission();
                 hide();
             }
         });
 
+        mAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseAuth != null) {
+            User = firebaseAuth.getDisplayName().toString();
+        }
+
+
+        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
+        if (signInAccount != null) {
+            User = signInAccount.getDisplayName().toString();
+        }
         return view;
     }
 
@@ -114,6 +126,7 @@ public class CameraFragment extends Fragment {
     private void askCameraPermission() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_CODE);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_CODE);
         } else {
             dispatchTakePictureIntent();
         }
@@ -137,9 +150,14 @@ public class CameraFragment extends Fragment {
             if (resultCode == getActivity().RESULT_OK) {
                 File f = new File(currentPhotoPath);
                 imageToUploadIV.setImageURI(Uri.fromFile(f));
-//                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-//                imageToUploadIV.setImageBitmap(bitmap);
 
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri contentUri = Uri.fromFile(f);
+
+                mediaScanIntent.setData(contentUri);
+                getActivity().sendBroadcast(mediaScanIntent);
+
+                UploadImageToFireBase(f.getName(), contentUri);
 
             } else if (requestCode != REQUEST_CODE) {
                 Toast.makeText(getActivity(), "Request code doesn't match", Toast.LENGTH_SHORT).show();
@@ -153,103 +171,76 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    private void uploadOurImage() {
-        try {
-            if (imageDataInUriForm != null && !imageNameET.getText().toString().isEmpty()
-                    && isImageSelected) {
-                bar.setVisibility(View.VISIBLE);
-                //yourName.jpeg
-                String imageName = imageNameET.getText().toString() + "." + getExtension(imageDataInUriForm);
+    private void UploadImageToFireBase(String name, final Uri contentUri) {
+        final StorageReference image = objectStorageReference.child(name);
+        image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 final String Caption = imageNameET.getText().toString();
-
-                //FirebaseStorage/BSCSAImagesFolder/yourName.jpeg
-                final StorageReference actualImageRef = objectStorageReference.child(imageName);
-
-                UploadTask uploadTask = actualImageRef.putFile(imageDataInUriForm);
-                uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                    @Override
-                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                        if (!task.isSuccessful()) {
-                            bar.setVisibility(View.INVISIBLE);
-                            throw task.getException();
-                        }
-                        return actualImageRef.getDownloadUrl();
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                image.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                     @Override
                     public void onComplete(@NonNull Task<Uri> task) {
                         if (task.isSuccessful()) {
-                            String url = task.getResult().toString();
+                            String url = contentUri.toString();
                             Map<String, Object> objectMap = new HashMap<>();
                             objectMap.put("URL", url);
                             objectMap.put("Comments", Caption);
                             objectMap.put("Server Time Stamp", FieldValue.serverTimestamp());
+                            objectMap.put("By", User);
                             objectFirebaseFirestore.collection("Gallery")
                                     .document(imageNameET.getText().toString())
                                     .set(objectMap)
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            bar.setVisibility(View.INVISIBLE);
                                             Toast.makeText(getActivity(), "Fails To Upload Image URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     })
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            imageNameET.setText("");
-                                            imageToUploadIV.setVisibility(View.INVISIBLE);
-                                            bar.setVisibility(View.INVISIBLE);
-                                            gallery.setVisibility(View.VISIBLE);
+//                                            lottie.setVisibility(View.INVISIBLE);
+//                                            Toast.makeText(getActivity(), "Image Successfully Uploaded: ", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                            objectFirebaseFirestore.collection(User)
+                                    .document(imageNameET.getText().toString())
+                                    .set(objectMap)
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(getActivity(), "Fails To Upload Image URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            lottie.setVisibility(View.INVISIBLE);
                                             Toast.makeText(getActivity(), "Image Successfully Uploaded: ", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                         }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        bar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(getActivity(), "Fails To Upload Image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
                 });
-            } else if (imageDataInUriForm == null) {
-                gallery.setVisibility(View.VISIBLE);
-                Toast.makeText(getActivity(), "No Image Is Selected", Toast.LENGTH_SHORT).show();
-            } else if (imageNameET.getText().toString().isEmpty()) {
-                Toast.makeText(getActivity(), "Please First You Need To Enter An Image Name", Toast.LENGTH_SHORT).show();
-                imageNameET.requestFocus();
-            } else if (!isImageSelected) {
-                gallery.setVisibility(View.VISIBLE);
-                Toast.makeText(getActivity(), "Please Select An Image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please wait Uploading", Toast.LENGTH_SHORT).show();
             }
-        } catch (Exception e) {
-            gallery.setVisibility(View.VISIBLE);
-            Toast.makeText(getActivity(), "uploadOurImage:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                lottie.setVisibility(View.INVISIBLE);
+                Toast.makeText(getActivity(), "Failed To Uplaod", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private String getExtension(Uri imageDataInUriForm) {
-        try {
-            Context applicationContext = MainPage.getContextOfApplication();
-            applicationContext.getContentResolver();
-            ContentResolver objectContentResolver = applicationContext.getContentResolver();
-            MimeTypeMap objectMimeTypeMap = MimeTypeMap.getSingleton();
-
-            String extension = objectMimeTypeMap.getExtensionFromMimeType(objectContentResolver.getType(imageDataInUriForm));
-            return extension;
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "getExtension:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-
-        return "";
-    }
 
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        String imageFileName = imageNameET.getText().toString();
+//        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File storageDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -269,16 +260,20 @@ public class CameraFragment extends Fragment {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-            } catch (IOException ex) {
-                Toast.makeText(getActivity(), "Exception at Dispatch Pitcure", Toast.LENGTH_SHORT).show();
+            } catch (Exception ex) {
+                Toast.makeText(getActivity(), "dispatchTakePictureIntent: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(getActivity(),
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, CAMERA_CODE);
+                try {
+                    Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                            "com.example.android.fileprovider",
+                            photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, CAMERA_CODE);
+                } catch (Exception ex) {
+                    Toast.makeText(getActivity(), "dispatchTakePictureIntent: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

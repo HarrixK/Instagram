@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -19,10 +19,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.SignInMethodQueryResult;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,10 +28,9 @@ import java.util.Map;
 public class PageForSignup extends AppCompatActivity {
 
     private Button signup;
-    private TextView Signin;
+    private TextView Signin, Admin;
 
     private EditText emailET, paswwordET, username;
-    private ProgressBar bar;
 
     private FirebaseAuth objectFirebaseAuth;
     private static final String CollectionName = "Users";
@@ -41,9 +38,10 @@ public class PageForSignup extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth mAuth;
 
-    DocumentReference objectDocumentReference;
-    Task<QuerySnapshot> objectDocumentReference2;
     private FirebaseFirestore objectFirebaseFirestore;
+    private DatabaseReference reference;
+
+    private LottieAnimationView lottie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +58,8 @@ public class PageForSignup extends AppCompatActivity {
 
             emailET = findViewById(R.id.Username);
             paswwordET = findViewById(R.id.Password);
+
+            lottie = findViewById(R.id.Lottie);
             username = findViewById(R.id.Uname);
 
             Signin.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +71,8 @@ public class PageForSignup extends AppCompatActivity {
             signup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    lottie.playAnimation();
+                    lottie.setVisibility(View.VISIBLE);
                     checkuser();
                 }
             });
@@ -79,8 +81,15 @@ public class PageForSignup extends AppCompatActivity {
             objectFirebaseAuth = FirebaseAuth.getInstance();
 
             objectFirebaseFirestore = FirebaseFirestore.getInstance();
+            Admin = findViewById(R.id.Admin);
 
-            bar = findViewById(R.id.ProgressBar);
+            Admin.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(PageForSignup.this, AdminSignup.class));
+                    finish();
+                }
+            });
         } catch (Exception ex) {
             Toast.makeText(this, "ConnectWithXML: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -93,7 +102,6 @@ public class PageForSignup extends AppCompatActivity {
 
     private void checkuser() {
         try {
-            bar.setVisibility(View.VISIBLE);
             if (!emailET.getText().toString().isEmpty()) {
                 if (objectFirebaseAuth != null) {
                     signup.setEnabled(false);
@@ -105,11 +113,11 @@ public class PageForSignup extends AppCompatActivity {
                                     if (!check) {
                                         signup.setEnabled(true);
 
-                                        bar.setVisibility(View.INVISIBLE);
+                                        lottie.setVisibility(View.INVISIBLE);
                                         Toast.makeText(PageForSignup.this, "User Already Exists", Toast.LENGTH_SHORT).show();
 
                                     } else if (check) {
-                                        bar.setVisibility(View.INVISIBLE);
+                                        lottie.setVisibility(View.INVISIBLE);
 
                                         signup.setEnabled(true);
                                         Signup();
@@ -118,7 +126,7 @@ public class PageForSignup extends AppCompatActivity {
                             }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            bar.setVisibility(View.INVISIBLE);
+                            lottie.setVisibility(View.INVISIBLE);
                             signup.setEnabled(true);
 
                             Toast.makeText(PageForSignup.this, "Fails To Check If User Exists" + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -129,12 +137,12 @@ public class PageForSignup extends AppCompatActivity {
                 emailET.requestFocus();
                 signup.setEnabled(true);
 
-                bar.setVisibility(View.INVISIBLE);
+                lottie.setVisibility(View.INVISIBLE);
                 Toast.makeText(this, "Email and Password is Empty", Toast.LENGTH_SHORT).show();
             }
 
         } catch (Exception ex) {
-            bar.setVisibility(View.INVISIBLE);
+            lottie.setVisibility(View.INVISIBLE);
             signup.setEnabled(true);
 
             Toast.makeText(this, "Check User Error" + ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -143,83 +151,115 @@ public class PageForSignup extends AppCompatActivity {
 
     public void Signup() {
         try {
-            bar.setVisibility(View.VISIBLE);
             if (!emailET.getText().toString().isEmpty()
                     &&
                     !paswwordET.getText().toString().isEmpty()) {
                 if (objectFirebaseAuth != null) {
-                    bar.setVisibility(View.INVISIBLE);
                     signup.setEnabled(false);
 
-                    objectFirebaseAuth.createUserWithEmailAndPassword(emailET.getText().toString(),
-                            paswwordET.getText().toString()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                        @Override
-                        public void onSuccess(AuthResult authResult) {
-                            objectFirebaseFirestore.collection(CollectionName).document(username.getText().toString()).get()
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                            if (task.getResult().exists()) {
-                                                bar.setVisibility(View.INVISIBLE);
-                                                username.requestFocus();
-                                                Toast.makeText(PageForSignup.this, "Document Already Exists", Toast.LENGTH_SHORT).show();
-                                            } else {
-                                                Map<String, Object> objectMap = new HashMap<>();
-                                                objectMap.put("Username", username.getText().toString());
-                                                objectMap.put("Email", emailET.getText().toString());
-                                                objectFirebaseFirestore.collection(CollectionName)
-                                                        .document(username.getText().toString()).set(objectMap)
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                bar.setVisibility(View.INVISIBLE);
-                                                                Toast.makeText(PageForSignup.this, "Data Added Successfully", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-                                                                bar.setVisibility(View.INVISIBLE);
-                                                                Toast.makeText(PageForSignup.this, "Fails to add data", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                    });
-                            if (authResult.getUser() != null) {
+                    mAuth.createUserWithEmailAndPassword(emailET.getText().toString(), paswwordET.getText().toString())
+                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        Map<String, Object> objectMap = new HashMap<>();
+                                        objectMap.put("Username", username.getText().toString());
+                                        objectMap.put("Email", emailET.getText().toString());
+                                        objectFirebaseFirestore.collection(CollectionName)
+                                                .document(username.getText().toString())
+                                                .set(objectMap)
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(PageForSignup.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                })
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        lottie.setVisibility(View.INVISIBLE);
+                                                    }
+                                                });
+                                        lottie.setVisibility(View.INVISIBLE);
+                                        Toast.makeText(PageForSignup.this, "Sucessfully created a User", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        lottie.setVisibility(View.INVISIBLE);
+                                        Toast.makeText(PageForSignup.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
 
-                                objectFirebaseAuth.signOut();
-//                                emailET.setText("");
-//                                username.setText("");
-//                                paswwordET.setText("");
-                                emailET.requestFocus();
-
-                                signup.setEnabled(true);
-                                bar.setVisibility(View.INVISIBLE);
-                                Change();
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                            signup.setEnabled(true);
-                            emailET.requestFocus();
-
-                            bar.setVisibility(View.INVISIBLE);
-                            Toast.makeText(PageForSignup.this, "Failed To Create User" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+//                    objectFirebaseAuth.createUserWithEmailAndPassword(emailET.getText().toString(),
+//                            paswwordET.getText().toString()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+//                        @Override
+//                        public void onSuccess(AuthResult authResult) {
+//                            objectFirebaseFirestore.collection(CollectionName).document(username.getText().toString()).get()
+//                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                                        @Override
+//                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                                            if (task.getResult().exists()) {
+//                                                bar.setVisibility(View.INVISIBLE);
+//                                                username.requestFocus();
+//
+//                                                Toast.makeText(PageForSignup.this, "Document Already Exists", Toast.LENGTH_SHORT).show();
+//                                            } else {
+//                                                Map<String, Object> objectMap = new HashMap<>();
+//                                                objectMap.put("Username", username.getText().toString());
+//
+//                                                objectMap.put("Email", emailET.getText().toString());
+//                                                objectFirebaseFirestore.collection(CollectionName)
+//                                                        .document(username.getText().toString()).set(objectMap)
+//                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                                            @Override
+//                                                            public void onSuccess(Void aVoid) {
+//                                                                bar.setVisibility(View.INVISIBLE);
+//                                                                Toast.makeText(PageForSignup.this, "Data Added Successfully", Toast.LENGTH_SHORT).show();
+//                                                            }
+//                                                        })
+//                                                        .addOnFailureListener(new OnFailureListener() {
+//                                                            @Override
+//                                                            public void onFailure(@NonNull Exception e) {
+//                                                                bar.setVisibility(View.INVISIBLE);
+//                                                                Toast.makeText(PageForSignup.this, "Fails to add data", Toast.LENGTH_SHORT).show();
+//                                                            }
+//                                                        });
+//                                            }
+//                                        }
+//                                    });
+//                            if (authResult.getUser() != null) {
+//
+//                                objectFirebaseAuth.signOut();
+////                                emailET.setText("");
+////                                username.setText("");
+////                                paswwordET.setText("");
+//                                emailET.requestFocus();
+//
+//                                signup.setEnabled(true);
+//                                bar.setVisibility(View.INVISIBLE);
+//                                Change();
+//                            }
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//
+//                            signup.setEnabled(true);
+//                            emailET.requestFocus();
+//
+//                            bar.setVisibility(View.INVISIBLE);
+//                            Toast.makeText(PageForSignup.this, "Failed To Create User" + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
                 }
             } else if (emailET.getText().toString().isEmpty()) {
                 signup.setEnabled(true);
-                bar.setVisibility(View.INVISIBLE);
+                lottie.setVisibility(View.INVISIBLE);
 
                 emailET.requestFocus();
                 Toast.makeText(this, "Please Enter The Email", Toast.LENGTH_SHORT).show();
             } else if (paswwordET.getText().toString().isEmpty()) {
                 signup.setEnabled(true);
-                bar.setVisibility(View.INVISIBLE);
+                lottie.setVisibility(View.INVISIBLE);
 
                 paswwordET.requestFocus();
                 Toast.makeText(this, "Please Enter The Password", Toast.LENGTH_SHORT).show();
@@ -228,10 +268,14 @@ public class PageForSignup extends AppCompatActivity {
         } catch (Exception ex) {
 
             signup.setEnabled(true);
-            bar.setVisibility(View.INVISIBLE);
+            lottie.setVisibility(View.INVISIBLE);
 
             emailET.requestFocus();
             Toast.makeText(this, "Signup Error" + ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void User() {
+
     }
 }
